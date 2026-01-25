@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          String    @default("contributor")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  contents      Content[]
+  reviews       Review[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  guidelines  String?  // Admin instructions for contributors
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  topics      Topic[]
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  guidelines  String?  // Admin instructions for this topic
+  order       Int      @default(0)
+  courseId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  contents    Content[]
+}
+
+model Content {
+  id          String   @id @default(cuid())
+  title       String
+  body        String
+  status      String   @default("draft")
+  topicId     String
+  authorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  author      User     @relation(fields: [authorId], references: [id])
+  reviews     Review[]
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  comment     String
+  approved    Boolean
+  contentId   String
+  reviewerId  String
+  createdAt   DateTime @default(now())
+  
+  content     Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  reviewer    User     @relation(fields: [reviewerId], references: [id])
+}
