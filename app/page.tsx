@@ -1,6 +1,7 @@
 import { HeroSection } from "@/components/hero-section"
 import { AboutSection } from "@/components/about-section"
 import { ObjectivesSection } from "@/components/objectives-section"
+import { NetworkSection } from "@/components/network-section"
 import { CTASection } from "@/components/cta-section"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
@@ -12,6 +13,7 @@ export default function Home() {
       <HeroSection />
       <AboutSection />
       <ObjectivesSection />
+      <NetworkSection />
       <CTASection />
       <Footer />
     </main>

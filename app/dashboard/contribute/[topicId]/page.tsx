@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -23,7 +23,9 @@ export default function EditorPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const topicId = params.topicId as string;
+  const editId = searchParams.get("edit");
 
   const [topic, setTopic] = useState<Topic | null>(null);
   const [title, setTitle] = useState("");
@@ -32,10 +34,12 @@ export default function EditorPage() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [contentId, setContentId] = useState<string | null>(null);
+  const [contentId, setContentId] = useState<string | null>(editId);
   const [showGuidelines, setShowGuidelines] = useState(true);
+  const [loadingContent, setLoadingContent] = useState(!!editId);
 
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const initialLoadDone = useRef(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -49,6 +53,27 @@ export default function EditorPage() {
       .then(setTopic)
       .catch(console.error);
   }, [topicId]);
+
+  // Load existing content if editing
+  useEffect(() => {
+    if (editId && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      fetch(`/api/content/${editId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            setTitle(data.title || "");
+            setContent(data.body || "");
+            setContentId(data.id);
+          }
+          setLoadingContent(false);
+        })
+        .catch((err) => {
+          console.error("Failed to load content:", err);
+          setLoadingContent(false);
+        });
+    }
+  }, [editId]);
 
   // Auto-save function
   const autoSave = useCallback(async () => {
@@ -118,7 +143,7 @@ export default function EditorPage() {
           title,
           body: content,
           topicId,
-          status: asDraft ? "draft" : "review",
+          status: asDraft ? "draft" : "pending",
         }),
       });
 
@@ -136,7 +161,7 @@ export default function EditorPage() {
     }
   };
 
-  if (status === "loading" || !topic) {
+  if (status === "loading" || !topic || loadingContent) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-white">Loading...</div>
@@ -247,7 +272,7 @@ export default function EditorPage() {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Content
               </label>
-              <MarkdownEditor initialValue={content} onChange={setContent} />
+              <MarkdownEditor key={contentId || "new"} initialValue={content} onChange={setContent} />
             </div>
           </div>
 

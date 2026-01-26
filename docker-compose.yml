@@ -4,7 +4,15 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3003:3000"
+      - "3005:3000"
     environment:
       - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/ecid.db
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=http://localhost:3005
+    volumes:
+      - ecid-data:/app/data
     restart: unless-stopped
+
+volumes:
+  ecid-data:

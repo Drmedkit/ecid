@@ -31,6 +31,9 @@ export function Navbar() {
           <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors">
             Contact
           </a>
+          <a href="/learn" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium">
+            Learn
+          </a>
         </div>
 
         {/* Mobile menu button */}
@@ -67,6 +70,13 @@ export function Navbar() {
               className="text-foreground hover:text-primary transition-colors py-2"
             >
               Contact
+            </a>
+            <a
+              href="/learn"
+              onClick={() => setIsOpen(false)}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-center"
+            >
+              Learn
             </a>
           </div>
         </div>

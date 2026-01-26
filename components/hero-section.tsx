@@ -30,7 +30,7 @@ export function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
-              <Link href="/dashboard/courses">
+              <Link href="/learn">
                 <Button
                   size="lg"
                   className="bg-primary hover:bg-primary/90 text-background font-bold text-base md:text-lg px-6 md:px-8 w-full sm:w-auto"

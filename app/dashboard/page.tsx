@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -31,7 +32,19 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#0a0a0a]">
       <nav className="border-b border-gray-800 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">ECID Dashboard</h1>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <Image
+                src="/images/ecid-logo-horizontal.png"
+                alt="ECID Logo"
+                width={100}
+                height={35}
+                className="object-contain"
+              />
+            </Link>
+            <span className="text-gray-600">|</span>
+            <h1 className="text-xl font-bold text-white">Dashboard</h1>
+          </div>
           <div className="flex items-center gap-4">
             <span className="text-gray-400">{session.user.email}</span>
             <span className="px-2 py-1 text-xs bg-[#0EF0EB]/20 text-[#0EF0EB] rounded">
@@ -52,7 +65,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link
-            href="/dashboard/courses"
+            href="/learn"
             className="p-6 bg-[#1a1a1a] border border-gray-800 rounded-lg hover:border-[#0EF0EB] transition-colors"
           >
             <h3 className="text-lg font-semibold text-white mb-2">Courses</h3>

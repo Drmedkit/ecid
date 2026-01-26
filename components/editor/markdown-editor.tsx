@@ -33,6 +33,15 @@ export function MarkdownEditor({ initialValue = "", onChange }: MarkdownEditorPr
   const [mode, setMode] = useState<"visual" | "markdown">("visual");
   const [markdownContent, setMarkdownContent] = useState(initialValue);
   const editorInstance = useRef<Editor | null>(null);
+  const initialValueApplied = useRef(false);
+
+  // Sync with initialValue when it changes (for editing existing content)
+  useEffect(() => {
+    if (initialValue && !initialValueApplied.current) {
+      setMarkdownContent(initialValue);
+      initialValueApplied.current = true;
+    }
+  }, [initialValue]);
 
   useEffect(() => {
     if (mode !== "visual" || !editorRef.current) return;

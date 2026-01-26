@@ -28,3 +28,7 @@ next-env.d.ts
 /lib/generated/prisma
 dev.db
 dev.db-journal
+
+# Packages
+packages/*/node_modules/
+packages/*/.cache/
