@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Montserrat, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
+
 import AuthProvider from "@/components/providers/session-provider"
 import PasswordGate from "@/components/providers/password-gate"
 import "./globals.css"
@@ -32,7 +32,6 @@ export default function RootLayout({
             {children}
           </PasswordGate>
         </AuthProvider>
-        <Analytics />
       </body>
     </html>
   )

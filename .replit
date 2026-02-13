@@ -9,7 +9,14 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
+
+[userenv.development]
 NEXTAUTH_URL = "https://dcf91112-adc9-45a7-ae71-74854400caae-00-1e2vx6oddaxar.worf.replit.dev"
+NEXTAUTH_SECRET = "mTbOOkcZPZrBHjTZRj10Z6ABb0SH7uCeNB81H0yUzJU="
+
+[userenv.production]
+NEXTAUTH_URL = "https://esportscoach.eu"
+NEXTAUTH_SECRET = "mTbOOkcZPZrBHjTZRj10Z6ABb0SH7uCeNB81H0yUzJU="
 
 [workflows]
 runButton = "Project"
