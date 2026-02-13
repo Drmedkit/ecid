@@ -2,19 +2,43 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ url?: string; error?: string } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
+
+  const handleSyncSheets = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    try {
+      const res = await fetch("/api/sync-sheets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setSyncResult({ error: data.error });
+      } else {
+        setSyncResult({ url: data.url });
+      }
+    } catch (e: any) {
+      setSyncResult({ error: e.message || "Sync failed" });
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -98,6 +122,33 @@ export default function DashboardPage() {
               <h3 className="text-lg font-semibold text-white mb-2">Admin</h3>
               <p className="text-gray-400">Manage users and course structure</p>
             </Link>
+          )}
+
+          {session.user.role === "admin" && (
+            <div className="p-6 bg-[#1a1a1a] border border-gray-800 rounded-lg">
+              <h3 className="text-lg font-semibold text-white mb-2">Google Sheets Sync</h3>
+              <p className="text-gray-400 mb-4">Export database to Google Sheets</p>
+              <button
+                onClick={handleSyncSheets}
+                disabled={syncing}
+                className="w-full px-4 py-2 bg-[#0EF0EB] text-black font-semibold rounded-lg hover:bg-[#0EF0EB]/80 transition-colors disabled:opacity-50"
+              >
+                {syncing ? "Syncing..." : "Sync to Sheets"}
+              </button>
+              {syncResult?.url && (
+                <a
+                  href={syncResult.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block mt-3 text-sm text-[#0EF0EB] hover:underline"
+                >
+                  Open Spreadsheet
+                </a>
+              )}
+              {syncResult?.error && (
+                <p className="mt-3 text-sm text-red-400">{syncResult.error}</p>
+              )}
+            </div>
           )}
         </div>
       </main>
