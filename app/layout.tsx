@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Montserrat, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import AuthProvider from "@/components/providers/session-provider"
+import PasswordGate from "@/components/providers/password-gate"
 import "./globals.css"
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" })
@@ -27,7 +28,9 @@ export default function RootLayout({
     <html lang="en" className={`${montserrat.variable} ${geistMono.variable}`}>
       <body className="font-sans antialiased">
         <AuthProvider>
-          {children}
+          <PasswordGate>
+            {children}
+          </PasswordGate>
         </AuthProvider>
         <Analytics />
       </body>
