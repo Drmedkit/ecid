@@ -3,6 +3,7 @@ import { AboutSection } from "@/components/about-section"
 import { ObjectivesSection } from "@/components/objectives-section"
 import { NetworkSection } from "@/components/network-section"
 import { CTASection } from "@/components/cta-section"
+import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 
@@ -15,6 +16,7 @@ export default function Home() {
       <ObjectivesSection />
       <NetworkSection />
       <CTASection />
+      <ContactSection />
       <Footer />
     </main>
   )

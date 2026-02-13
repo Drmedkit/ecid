@@ -68,7 +68,15 @@ model Review {
   contentId   String
   reviewerId  String
   createdAt   DateTime @default(now())
-  
+
   content     Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
   reviewer    User     @relation(fields: [reviewerId], references: [id])
+}
+
+model ContactForm {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  message     String
+  createdAt   DateTime @default(now())
 }
