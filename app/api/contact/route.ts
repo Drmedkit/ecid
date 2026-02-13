@@ -3,6 +3,23 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Helper function to trigger contact sync in background
+async function triggerContactSync(spreadsheetId?: string) {
+  try {
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const body = spreadsheetId ? JSON.stringify({ spreadsheetId }) : '{}';
+
+    // Trigger sync in background (don't await)
+    fetch(`${baseUrl}/api/sync-contacts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    }).catch(err => console.error('Background contact sync failed:', err));
+  } catch (error) {
+    console.error('Failed to trigger contact sync:', error);
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -33,6 +50,12 @@ export async function POST(request: NextRequest) {
         message,
       },
     });
+
+    // Get spreadsheet ID from environment variable if configured
+    const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+
+    // Trigger sync to Google Sheets in background (non-blocking)
+    triggerContactSync(spreadsheetId);
 
     return NextResponse.json(
       {
