@@ -8,6 +8,7 @@ const nextConfig = {
     unoptimized: true,
   },
   allowedDevOrigins: ['*.worf.replit.dev', '*.replit.dev'],
+  serverExternalPackages: ['bcryptjs'],
 }
 
 export default nextConfig
