@@ -18,16 +18,17 @@ export async function POST(request: NextRequest) {
 
     const sheets = await getGoogleSheetClient();
 
-    const [users, courses, topics, contents, reviews] = await Promise.all([
+    const [users, courses, topics, contents, reviews, contacts] = await Promise.all([
       prisma.user.findMany({ orderBy: { createdAt: "asc" } }),
       prisma.course.findMany({ orderBy: { order: "asc" } }),
       prisma.topic.findMany({ orderBy: { order: "asc" }, include: { course: true } }),
       prisma.content.findMany({ orderBy: { createdAt: "asc" }, include: { topic: true, author: true } }),
       prisma.review.findMany({ orderBy: { createdAt: "asc" }, include: { content: true, reviewer: true } }),
+      prisma.contactForm.findMany({ orderBy: { createdAt: "desc" } }),
     ]);
 
     if (spreadsheetId) {
-      await syncToExistingSheet(sheets, spreadsheetId, users, courses, topics, contents, reviews);
+      await syncToExistingSheet(sheets, spreadsheetId, users, courses, topics, contents, reviews, contacts);
       return NextResponse.json({ success: true, spreadsheetId });
     }
 
@@ -40,12 +41,13 @@ export async function POST(request: NextRequest) {
           { properties: { title: "Topics" } },
           { properties: { title: "Content" } },
           { properties: { title: "Reviews" } },
+          { properties: { title: "Contact Forms" } },
         ],
       },
     });
 
     const newId = spreadsheet.data.spreadsheetId!;
-    await syncToExistingSheet(sheets, newId, users, courses, topics, contents, reviews);
+    await syncToExistingSheet(sheets, newId, users, courses, topics, contents, reviews, contacts);
 
     return NextResponse.json({ success: true, spreadsheetId: newId, url: spreadsheet.data.spreadsheetUrl });
   } catch (error: any) {
@@ -61,12 +63,13 @@ async function syncToExistingSheet(
   courses: any[],
   topics: any[],
   contents: any[],
-  reviews: any[]
+  reviews: any[],
+  contacts: any[]
 ) {
   const existingSheets = await sheets.spreadsheets.get({ spreadsheetId });
   const sheetNames = existingSheets.data.sheets?.map((s: any) => s.properties?.title) || [];
 
-  const requiredSheets = ["Users", "Courses", "Topics", "Content", "Reviews"];
+  const requiredSheets = ["Users", "Courses", "Topics", "Content", "Reviews", "Contact Forms"];
   const missingSheets = requiredSheets.filter((name) => !sheetNames.includes(name));
 
   if (missingSheets.length > 0) {
@@ -105,6 +108,11 @@ async function syncToExistingSheet(
     ...reviews.map((r) => [r.id, r.comment || "", r.approved ? "Yes" : "No", r.content?.title || "", r.reviewer?.name || r.reviewer?.email || "", r.createdAt?.toISOString() || ""]),
   ];
 
+  const contactsData = [
+    ["ID", "Name", "Email", "Message", "Submitted At"],
+    ...contacts.map((c) => [c.id, c.name, c.email, c.message, c.createdAt?.toISOString() || ""]),
+  ];
+
   await sheets.spreadsheets.values.batchUpdate({
     spreadsheetId,
     requestBody: {
@@ -115,6 +123,7 @@ async function syncToExistingSheet(
         { range: "Topics!A1", values: topicsData },
         { range: "Content!A1", values: contentData },
         { range: "Reviews!A1", values: reviewsData },
+        { range: "Contact Forms!A1", values: contactsData },
       ],
     },
   });
