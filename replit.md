@@ -4,7 +4,7 @@
 A Next.js application for a European esports coaching framework that fosters inclusion, responsible digital habits, and player well-being for grassroots youth esports.
 
 ## Tech Stack
-- **Framework**: Next.js 16 with App Router
+- **Framework**: Next.js 15 with App Router
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: NextAuth.js with credentials provider
 - **Styling**: Tailwind CSS 4
